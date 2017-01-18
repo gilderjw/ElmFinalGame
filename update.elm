@@ -37,15 +37,39 @@ straightBulletUpdate x y speed delta =
         newX = x
     in BUpdater (newX, newY) (straightBulletUpdate newX newY speed)
 
-stillEnemyUpdate : Float -> Float -> Float -> EnemyUpdater
-stillEnemyUpdate x y delta =
-  EnemyUpdater (x, y) (stillEnemyUpdate x y)
+stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
+stillEnemyUpdate x y width height delta =
+  EnemyUpdater (x, y, width, height) (stillEnemyUpdate x y width height)
 
-isOnScreen : BUpdater -> Bool
-isOnScreen updater =
+bulletIsOnScreen : BUpdater -> Bool
+bulletIsOnScreen updater =
   case updater of 
     BUpdater (x, y) _ ->
       x <= 500 && x >= 0 && y <= 500 && y >= 0
+
+hit : Float -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> Bool
+hit x1 y1 width1 height1 x2 y2 width2 height2 =
+  (abs (x1 - x2)) < (width1/2 + width2/2) &&
+  (abs (y1 - y2)) < (height1/2 + height2/2)
+
+isEnemyHitByBullet : EnemyUpdater -> BUpdater -> Bool
+isEnemyHitByBullet enemy bullet =
+  case enemy of
+    EnemyUpdater (x, y, width, height) _ -> 
+      (case bullet of
+        BUpdater (bx, by) _ ->
+          (hit x y width height bx by 5 5))
+    
+
+enemyIsAlive : Model -> EnemyUpdater ->  Bool
+enemyIsAlive model updater =
+  case updater of 
+    EnemyUpdater (x, y, width, height) _ ->
+      (x <= 500 && x >= 0 && y <= 500 && y >= 0) --out of bounds
+      && (not (List.foldr 
+              (\bullet acc -> (acc || (isEnemyHitByBullet updater bullet))) 
+              False 
+              model.bullets))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -54,10 +78,12 @@ update msg model =
         Tick newTime -> 
           case model.lastTime of
             Just oldTime -> 
-              let newBullets = List.map (updateBullet (newTime - oldTime)) model.bullets in
+              let newBullets = List.map (updateBullet (newTime - oldTime)) model.bullets 
+                  newEnemies = List.map (updateEnemy (newTime - oldTime)) model.enemies
+              in
               ({model | lastTime=Just newTime
-                      , bullets=List.filter isOnScreen newBullets
-                      , enemies=List.map (updateEnemy (newTime - oldTime)) model.enemies }, Cmd.none)
+                      , bullets=List.filter bulletIsOnScreen newBullets
+                      , enemies= List.filter (enemyIsAlive model) newEnemies}, Cmd.none)
             Nothing -> ({model | lastTime = Just newTime}, Cmd.none)
       
 

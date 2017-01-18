@@ -14,4 +14,5 @@ type ButtonState
 
 type BUpdater = BUpdater (Float, Float) (Float -> BUpdater)
 
-type EnemyUpdater = EnemyUpdater (Float, Float) (Float -> EnemyUpdater)
+-- the floats go : x, y, width, height
+type EnemyUpdater = EnemyUpdater (Float, Float, Float, Float) (Float -> EnemyUpdater)

@@ -89,5 +89,5 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[stillEnemyUpdate 300 300 0]
+    enemies=[stillEnemyUpdate 300 40 40 40 0]
     }, Cmd.none)

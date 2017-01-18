@@ -13,7 +13,12 @@ bulletToImage updater =
 enemyToImage: EnemyUpdater -> Svg Msg
 enemyToImage updater =
   case updater of
-    EnemyUpdater (x1, y1) _ -> rect [ x (toString x1), y (toString y1), width "40", height "40", fill "c6ff00"] []
+    EnemyUpdater (x1, y1, width1, height1) _ -> 
+      rect [ x (toString (x1 - width1/2))
+           , y (toString (y1 - height1/2))
+           , width (toString width1)
+           , height (toString height1)
+           , fill "ffff00"] []
 
 view : Model -> Html Msg
 view model = 
