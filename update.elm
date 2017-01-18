@@ -12,6 +12,11 @@ updateBullet delta updater =
   case updater of
     BUpdater _ func -> func delta
 
+updateEnemy : Float -> EnemyUpdater -> EnemyUpdater
+updateEnemy delta updater =
+  case updater of
+    EnemyUpdater _ func -> func delta
+
 updateControls : Model -> ButtonState -> Model
 updateControls model keyCode =
   case keyCode of
@@ -32,6 +37,10 @@ straightBulletUpdate x y speed delta =
         newX = x
     in BUpdater (newX, newY) (straightBulletUpdate newX newY speed)
 
+stillEnemyUpdate : Float -> Float -> Float -> EnemyUpdater
+stillEnemyUpdate x y delta =
+  EnemyUpdater (x, y) (stillEnemyUpdate x y)
+
 isOnScreen : BUpdater -> Bool
 isOnScreen updater =
   case updater of 
@@ -47,7 +56,8 @@ update msg model =
             Just oldTime -> 
               let newBullets = List.map (updateBullet (newTime - oldTime)) model.bullets in
               ({model | lastTime=Just newTime
-                      , bullets = List.filter isOnScreen newBullets }, Cmd.none)
+                      , bullets=List.filter isOnScreen newBullets
+                      , enemies=List.map (updateEnemy (newTime - oldTime)) model.enemies }, Cmd.none)
             Nothing -> ({model | lastTime = Just newTime}, Cmd.none)
       
 

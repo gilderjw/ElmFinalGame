@@ -83,9 +83,11 @@ init : (Model, Cmd Msg)
 init =
   ({x=30,
     y=440, 
-    key = None, 
+    key=None, 
     vel=5, 
     bullets=[],
     width=50,
     height=50,
-    lastTime = Nothing}, Cmd.none)
+    lastTime=Nothing,
+    enemies=[stillEnemyUpdate 300 300 0]
+    }, Cmd.none)
