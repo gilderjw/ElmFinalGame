@@ -82,5 +82,4 @@ main =
 init : (Model, Cmd Msg)
 init =
   ({x=30,
-    y=440,
-    key=None}, Cmd.none)
+    y=440, key = None, vel=5}, Cmd.none)

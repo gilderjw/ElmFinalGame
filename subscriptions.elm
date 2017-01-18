@@ -4,24 +4,49 @@ import ElmFinalGame.Types exposing (..)
 import Keyboard
 
 -- SUBSCRIPTIONS
--- 37 is left
--- 39 is right
+-- 65 is a
+-- 68 is d
+-- 87 is w
+-- 83 is s
+
 handleDown : (Keyboard.KeyCode, ButtonState) -> Msg
 handleDown state =
     case state of
-        (68, Left) -> Key Both
-        (65, Right) -> Key Both
         (68, None) -> Key Right
         (65, None) -> Key Left
+        (87, None) -> Key Up
+        (83, None) -> Key Down
+
+        (87, Left) -> Key UpLeft
+        (87, Right) -> Key UpRight
+        (83, Left) -> Key DownLeft
+        (83, Right) -> Key DownRight
+
+        (65, Up) -> Key UpLeft
+        (68, Up) -> Key UpRight
+        (65, Down) -> Key DownLeft
+        (68, Down) -> Key DownRight
+
         (_ , current) -> Key current
 
 handleUp : (Keyboard.KeyCode, ButtonState) -> Msg
 handleUp state =
     case state of
-        (68, Both) -> Key Left
-        (65, Both) -> Key Right
+        (87, Up) -> Key None
+        (83, Down) -> Key None
         (68, Right) -> Key None
         (65, Left) -> Key None
+
+        (65, UpLeft) -> Key Up
+        (65, DownLeft) -> Key Down
+        (68, UpRight) -> Key Up
+        (68, DownRight) -> Key Down
+
+        (87, UpLeft) -> Key Left
+        (87, UpRight) -> Key Right
+        (83, DownLeft) -> Key Left
+        (83, DownRight) -> Key Right
+
         (_ , current) -> Key current
 
 
