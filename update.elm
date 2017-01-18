@@ -3,6 +3,10 @@ module ElmFinalGame.Update exposing (..)
 import ElmFinalGame.Types exposing (..)
 --import Time exposing (..)
 
+spawnStraigtBullet : Model -> Float -> Model
+spawnStraigtBullet model speed =
+  {model| bullets = List.append model.bullets [straightBulletUpdate model.x model.y speed 0]}
+
 updateBullet : Float -> BUpdater -> BUpdater
 updateBullet delta updater =
   case updater of
@@ -19,7 +23,7 @@ updateControls model keyCode =
     UpRight -> {model| y = model.y - model.vel, x = model.x + model.vel, key = keyCode}
     DownLeft -> {model| y = model.y + model.vel, x = model.x - model.vel, key = keyCode}
     DownRight -> {model| y = model.y + model.vel, x = model.x + model.vel, key = keyCode}
-    Shoot -> (updateControls model model.key)
+    Shoot -> (spawnStraigtBullet (updateControls model model.key) -20)
     _ -> {model | key = keyCode}
 
 straightBulletUpdate : Float -> Float -> Float -> Float -> BUpdater

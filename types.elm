@@ -2,8 +2,9 @@ module ElmFinalGame.Types exposing (..)
 import Time exposing (..)
 
 type alias Model = 
-  {x : Int, y : Int, key : ButtonState, vel : Int
-  , bullets : List(BUpdater), lastTime : Maybe Time}
+  {x : Float, y : Float, key : ButtonState, vel : Float
+  , bullets : List(BUpdater), lastTime : Maybe Time
+  , width : Float, height : Float}
 
 type Msg
   = Key ButtonState | Tick Time

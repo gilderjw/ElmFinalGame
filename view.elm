@@ -15,6 +15,11 @@ view : Model -> Html Msg
 view model = 
    svg [ viewBox "0 0 500 500", width "500px" ]
        (List.append
-       (List.map bulletToImage model.bullets)
-       [ rect [ x (toString model.x), y (toString model.y), width "60", height "10", fill "#0B79CE" ] []
-       ])
+         (List.map bulletToImage model.bullets)
+         [ rect [ x (toString (model.x - model.width/2)), 
+                  y (toString (model.y - model.height/2)), 
+                  width (toString model.width), 
+                  height (toString model.height), 
+                  fill "#0B79CE" ] []
+         ]
+       )
