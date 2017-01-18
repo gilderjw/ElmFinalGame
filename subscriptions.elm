@@ -2,12 +2,14 @@ module ElmFinalGame.Subscriptions exposing (..)
 
 import ElmFinalGame.Types exposing (..)
 import Keyboard
+import Time exposing (..)
 
 -- SUBSCRIPTIONS
 -- 65 is a
 -- 68 is d
 -- 87 is w
 -- 83 is s
+-- 32 is space
 
 handleDown : (Keyboard.KeyCode, ButtonState) -> Msg
 handleDown state =
@@ -26,6 +28,8 @@ handleDown state =
         (68, Up) -> Key UpRight
         (65, Down) -> Key DownLeft
         (68, Down) -> Key DownRight
+
+        (32, _) -> Key Shoot
 
         (_ , current) -> Key current
 
@@ -58,4 +62,5 @@ subscriptions model =
     [
       Keyboard.downs (\k -> handleDown (k, model.key))
       , Keyboard.ups (\k -> handleUp (k, model.key))
+      , Time.every (Time.second/60) Tick
      ]

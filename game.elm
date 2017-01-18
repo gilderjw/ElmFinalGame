@@ -82,4 +82,8 @@ main =
 init : (Model, Cmd Msg)
 init =
   ({x=30,
-    y=440, key = None, vel=5}, Cmd.none)
+    y=440, 
+    key = None, 
+    vel=5, 
+    bullets=[straightBulletUpdate 400 400 20 0],
+    lastTime = Nothing}, Cmd.none)

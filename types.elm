@@ -1,14 +1,14 @@
 module ElmFinalGame.Types exposing (..)
+import Time exposing (..)
 
-type alias Model = {x : Int, y : Int, key : ButtonState, vel : Int}
+type alias Model = 
+  {x : Int, y : Int, key : ButtonState, vel : Int
+  , bullets : List(BUpdater), lastTime : Maybe Time}
 
 type Msg
-  = Key ButtonState
+  = Key ButtonState | Tick Time
 
 type ButtonState
-  = Left | Right | Up | Down | UpRight | UpLeft | DownRight | DownLeft | None
+  = Left | Right | Up | Down | UpRight | UpLeft | DownRight | DownLeft | Shoot | None
 
--- 68 is a
--- 65 is d
--- 87 is w
--- 83 is s
+type BUpdater = BUpdater (Float, Float) (Float -> BUpdater)
