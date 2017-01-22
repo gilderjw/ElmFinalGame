@@ -63,4 +63,5 @@ subscriptions model =
       Keyboard.downs (\k -> handleDown (k, model.key))
       , Keyboard.ups (\k -> handleUp (k, model.key))
       , Time.every (Time.second/60) Tick
+      , Time.every (Time.second) Tock
      ]

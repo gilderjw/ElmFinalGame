@@ -7,7 +7,7 @@ type alias Model =
   , width : Float, height : Float, enemies : List(EnemyUpdater)}
 
 type Msg
-  = Key ButtonState | Tick Time
+  = Key ButtonState | Tick Time | Tock Time
 
 type ButtonState
   = Left | Right | Up | Down | UpRight | UpLeft | DownRight | DownLeft | Shoot | None

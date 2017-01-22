@@ -89,12 +89,14 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[allahuakbarEnemyUpdate 
+    enemies=[shootingEnemyUpdate 
                 200
-                0
+                20
+                200
+                20
                 40 
                 40 
-                10 
+                3 
                 {x=30,
                  y=440, 
                  key=None, 

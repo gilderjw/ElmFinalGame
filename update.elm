@@ -98,6 +98,13 @@ allahuakbarEnemyUpdate  x y width height speed model delta =
 
   in EnemyUpdater (newX, newY, width, height) (allahuakbarEnemyUpdate newX newY width height speed)
 
+shootingEnemyUpdate : Float -> Float -> Float -> Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
+shootingEnemyUpdate x y initialX initialY width height speed model delta =
+  let newY = y + (delta/60 * speed)
+      deltaY = newY - initialY
+      newX = initialX + 120*sin (deltaY/20)
+  in EnemyUpdater (newX, initialY, width, height) (shootingEnemyUpdate newX newY initialX initialY width height speed)
+
 --CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool
 bulletIsOnScreen updater =
@@ -107,6 +114,16 @@ bulletIsOnScreen updater =
     HUpdater (x, y) _ ->
       x <= 500 && x >= 0 && y <= 500 && y >= 0
 
+enemyToBullet : List(EnemyUpdater) -> List(BUpdater)
+enemyToBullet enemies =
+  List.map (\enemy ->
+                      case enemy of
+                        EnemyUpdater (x, y, _, height) _ -> 
+                          (straightBulletUpdate x (y+5+height/2) 5 0)) enemies
+
+enemyShoot : Model -> Model
+enemyShoot model =
+  {model| bullets = List.append model.bullets (enemyToBullet model.enemies)}
 
 --HIT DETECTION
 hit : Float -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> Bool
@@ -218,15 +235,23 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Key q -> (updateControls model q, Cmd.none)
+        Tock newTime ->
+          case model.lastTime of
+            Just oldTime -> 
+              let newBullets = List.map ((updateBullet model) (newTime - oldTime)) model.bullets 
+                  newEnemies = List.map (updateEnemy model (newTime - oldTime)) model.enemies
+              in (enemyShoot (dealWithPlayerCollision {model | lastTime=Just newTime
+                            , bullets=List.filter bulletIsOnScreen newBullets
+                            , enemies= List.filter (enemyIsAlive model) newEnemies}), Cmd.none)
+            Nothing -> ({model | lastTime = Just newTime}, Cmd.none)
         Tick newTime -> 
           case model.lastTime of
             Just oldTime -> 
               let newBullets = List.map ((updateBullet model) (newTime - oldTime)) model.bullets 
                   newEnemies = List.map (updateEnemy model (newTime - oldTime)) model.enemies
-              in
-              (dealWithPlayerCollision {model | lastTime=Just newTime
-                      , bullets=List.filter bulletIsOnScreen newBullets
-                      , enemies= List.filter (enemyIsAlive model) newEnemies}, Cmd.none)
+              in (dealWithPlayerCollision {model | lastTime=Just newTime
+                        , bullets=List.filter bulletIsOnScreen newBullets
+                        , enemies= List.filter (enemyIsAlive model) newEnemies}, Cmd.none)
             Nothing -> ({model | lastTime = Just newTime}, Cmd.none)
       
 

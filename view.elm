@@ -19,7 +19,7 @@ enemyToImage updater =
            , y (toString (y1 - height1/2))
            , width (toString width1)
            , height (toString height1)
-           , fill "ffff00"] []
+           , fill "#ffff00"] []
 
 view : Model -> Html Msg
 view model = 
