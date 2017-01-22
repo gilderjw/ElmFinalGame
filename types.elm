@@ -12,7 +12,8 @@ type Msg
 type ButtonState
   = Left | Right | Up | Down | UpRight | UpLeft | DownRight | DownLeft | Shoot | None
 
-type BUpdater = BUpdater (Float, Float) (Float -> BUpdater)
+type BUpdater = BUpdater (Float, Float) (Float -> BUpdater) |
+                HUpdater (Float, Float) (Model -> Float -> BUpdater)
 
 -- the floats go : x, y, width, height
 type EnemyUpdater = EnemyUpdater (Float, Float, Float, Float) (Float -> EnemyUpdater)

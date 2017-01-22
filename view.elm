@@ -9,6 +9,7 @@ bulletToImage: BUpdater -> Svg Msg
 bulletToImage updater = 
   case updater of
     BUpdater (x,y) _ -> circle [ cx (toString x), cy (toString y), r "3", fill "#ff0000"][]
+    HUpdater (x,y) _ -> circle [ cx (toString x), cy (toString y), r "3", fill "#ff0000"][]
 
 enemyToImage: EnemyUpdater -> Svg Msg
 enemyToImage updater =
@@ -18,11 +19,11 @@ enemyToImage updater =
            , y (toString (y1 - height1/2))
            , width (toString width1)
            , height (toString height1)
-           , fill "#ffc000"] []
+           , fill "ffff00"] []
 
 view : Model -> Html Msg
 view model = 
-   svg [ viewBox "0 0 500 500", width "500px"]
+   svg [ viewBox "0 0 500 500", width "500px" ]
        (List.append 
          (List.append
            (List.map bulletToImage model.bullets)

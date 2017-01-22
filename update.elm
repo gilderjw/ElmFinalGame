@@ -28,10 +28,11 @@ spawnTripleBullet model xspeed yspeed =
 
 spawnHomingBullet : Model -> Float -> Model
 spawnHomingBullet model speed =
-  {model| bullets = List.append model.bullets [homingBulletUpdate model 
+  {model| bullets = List.append model.bullets [homingBulletUpdate
                                                                   model.x
                                                                   (model.y-(model.height/2) - 10)
                                                                   speed
+                                                                  model
                                                                   0]}
 
 --BULLET UPDATES
@@ -55,8 +56,8 @@ angleBulletUpdate x y xspeed yspeed delta =
       newX = x + ((xspeed * delta) / 60 )
   in BUpdater (newX, newY) (angleBulletUpdate newX newY xspeed yspeed)
 
-homingBulletUpdate : Model -> Float -> Float -> Float -> Float -> BUpdater
-homingBulletUpdate model x y speed delta =
+homingBulletUpdate : Float -> Float -> Float -> Model -> Float -> BUpdater
+homingBulletUpdate x y speed model delta =
   let (targetX, targetY) = (getClosestEnemy model x y (stillEnemyUpdate x -200 2 2 0)) in
   let yDist = (y - targetY)
       xDist = (x - targetX)
@@ -64,19 +65,21 @@ homingBulletUpdate model x y speed delta =
       newX = x + xDist / realDist * speed * delta /60
       newY = y + yDist / realDist * speed * delta /60
 
-  in BUpdater (newX, newY) (homingBulletUpdate model newX newY speed)
+  in HUpdater (newX, newY) (homingBulletUpdate newX newY speed)
 
 
 --ENEMY UPDATES
 stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
 stillEnemyUpdate x y width height delta =
-  EnemyUpdater (x, y, width, height) (stillEnemyUpdate x y width height)
+  EnemyUpdater (x-1, y, width, height) (stillEnemyUpdate (x-1) y width height)
 
 --CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool
 bulletIsOnScreen updater =
   case updater of 
     BUpdater (x, y) _ ->
+      x <= 500 && x >= 0 && y <= 500 && y >= 0
+    HUpdater (x, y) _ ->
       x <= 500 && x >= 0 && y <= 500 && y >= 0
 
 
@@ -92,6 +95,8 @@ isEnemyHitByBullet enemy bullet =
     EnemyUpdater (x, y, width, height) _ -> 
       (case bullet of
         BUpdater (bx, by) _ ->
+          (hit x y width height bx by 5 5)
+        HUpdater (bx, by) _ ->
           (hit x y width height bx by 5 5))
 
 isPlayerHitByEnemy : Model -> EnemyUpdater -> Bool
@@ -104,6 +109,8 @@ isPlayerHitByBullet : Model -> BUpdater -> Bool
 isPlayerHitByBullet model bullet = 
   case bullet of
     BUpdater (x, y) _ -> 
+      (hit x y 5 5 model.x model.y model.width model.height)
+    HUpdater (x, y) _ -> 
       (hit x y 5 5 model.x model.y model.width model.height)
 
 
@@ -171,10 +178,11 @@ updateControls model keyCode =
     Shoot -> (spawnHomingBullet (updateControls model model.key) -20)
     _ -> {model | key = keyCode}
 
-updateBullet : Float -> BUpdater -> BUpdater
-updateBullet delta updater =
+updateBullet : Model -> Float -> BUpdater -> BUpdater
+updateBullet model delta updater =
   case updater of
     BUpdater _ func -> func delta
+    HUpdater _ func -> func model delta
 
 updateEnemy : Float -> EnemyUpdater -> EnemyUpdater
 updateEnemy delta updater =
@@ -188,7 +196,7 @@ update msg model =
         Tick newTime -> 
           case model.lastTime of
             Just oldTime -> 
-              let newBullets = List.map (updateBullet (newTime - oldTime)) model.bullets 
+              let newBullets = List.map ((updateBullet model) (newTime - oldTime)) model.bullets 
                   newEnemies = List.map (updateEnemy (newTime - oldTime)) model.enemies
               in
               (dealWithPlayerCollision {model | lastTime=Just newTime
