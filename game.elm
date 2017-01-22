@@ -89,13 +89,19 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[sineEnemyUpdate 200 0 200 0 40 40 10 {x=30,
-                                            y=440, 
-                                            key=None, 
-                                            vel=5, 
-                                            bullets=[],
-                                            width=50,
-                                            height=50,
-                                            lastTime=Nothing,
-                                            enemies=[]} 0]
+    enemies=[allahuakbarEnemyUpdate 
+                200
+                0
+                40 
+                40 
+                10 
+                {x=30,
+                 y=440, 
+                 key=None, 
+                 vel=5, 
+                 bullets=[],
+                 width=50,
+                 height=50,
+                 lastTime=Nothing,
+                 enemies=[]} 0]
     }, Cmd.none)

@@ -87,6 +87,17 @@ sineEnemyUpdate x y initialX initialY width height speed model delta =
       newX = initialX + 80*sin (deltaY/20)
   in EnemyUpdater (newX, newY, width, height) (sineEnemyUpdate newX newY initialX initialY width height speed)
 
+allahuakbarEnemyUpdate : Float -> Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
+allahuakbarEnemyUpdate  x y width height speed model delta =
+  let (targetX, targetY) = (model.x, model.y) in
+    let yDist = (y - targetY)
+        xDist = (x - targetX)
+        realDist = sqrt(xDist^2 + yDist^2)
+        newX = x - xDist / realDist * speed * delta /60
+        newY = y - yDist / realDist * speed * delta /60
+
+  in EnemyUpdater (newX, newY, width, height) (allahuakbarEnemyUpdate newX newY width height speed)
+
 --CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool
 bulletIsOnScreen updater =
