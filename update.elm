@@ -1,6 +1,6 @@
-module ElmFinalGame.Update exposing (..)
+module Update exposing (..)
 
-import ElmFinalGame.Types exposing (..)
+import Types exposing (..)
 --import Time exposing (..)
 
 spawnStraightBullet : Model -> Float -> Model
@@ -59,7 +59,25 @@ isEnemyHitByBullet enemy bullet =
       (case bullet of
         BUpdater (bx, by) _ ->
           (hit x y width height bx by 5 5))
-    
+
+isPlayerHitByEnemy : Model -> EnemyUpdater -> Bool
+isPlayerHitByEnemy model enemy =
+  case enemy of
+    EnemyUpdater (x, y, width, height) _ ->
+      (hit x y width height model.x model.y model.width model.height)
+
+dealWithPlayerCollision : Model -> Model
+dealWithPlayerCollision model =
+  if (List.foldr 
+        (\enemy acc -> acc || 
+                      (isPlayerHitByEnemy model enemy)) 
+        False 
+        model.enemies) then
+    {model|x = 9999999} -- nice and elegent solution for killing a player
+  else
+    model
+
+
 
 enemyIsAlive : Model -> EnemyUpdater ->  Bool
 enemyIsAlive model updater =
@@ -81,10 +99,11 @@ update msg model =
               let newBullets = List.map (updateBullet (newTime - oldTime)) model.bullets 
                   newEnemies = List.map (updateEnemy (newTime - oldTime)) model.enemies
               in
-              ({model | lastTime=Just newTime
+              (dealWithPlayerCollision {model | lastTime=Just newTime
                       , bullets=List.filter bulletIsOnScreen newBullets
                       , enemies= List.filter (enemyIsAlive model) newEnemies}, Cmd.none)
             Nothing -> ({model | lastTime = Just newTime}, Cmd.none)
       
+
 
 

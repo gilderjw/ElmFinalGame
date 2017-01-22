@@ -64,10 +64,10 @@ The enemies should be visibly distinct.
 
 -}
 
-import ElmFinalGame.Update exposing (..)
-import ElmFinalGame.Types exposing (..)
-import ElmFinalGame.Subscriptions exposing (..)
-import ElmFinalGame.View exposing (..)
+import Update exposing (..)
+import Types exposing (..)
+import Subscriptions exposing (..)
+import View exposing (..)
 import Html exposing (Html)
 
 main : Program Never Model Msg

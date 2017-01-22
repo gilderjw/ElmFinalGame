@@ -1,4 +1,4 @@
-module ElmFinalGame.Types exposing (..)
+module Types exposing (..)
 import Time exposing (..)
 
 type alias Model = 

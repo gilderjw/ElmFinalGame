@@ -1,6 +1,6 @@
-module ElmFinalGame.View exposing (..)
+module View exposing (..)
 
-import ElmFinalGame.Types exposing (..)
+import Types exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
@@ -18,11 +18,11 @@ enemyToImage updater =
            , y (toString (y1 - height1/2))
            , width (toString width1)
            , height (toString height1)
-           , fill "ffff00"] []
+           , fill "#ffc000"] []
 
 view : Model -> Html Msg
 view model = 
-   svg [ viewBox "0 0 500 500", width "500px" ]
+   svg [ viewBox "0 0 500 500", width "500px"]
        (List.append 
          (List.append
            (List.map bulletToImage model.bullets)

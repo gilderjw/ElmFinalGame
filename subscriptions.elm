@@ -1,6 +1,6 @@
-module ElmFinalGame.Subscriptions exposing (..)
+module Subscriptions exposing (..)
 
-import ElmFinalGame.Types exposing (..)
+import Types exposing (..)
 import Keyboard
 import Time exposing (..)
 
