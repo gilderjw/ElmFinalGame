@@ -26,6 +26,14 @@ spawnTripleBullet model xspeed yspeed =
                     ,angleBulletUpdate model.x (model.y-(model.height/2)) -xspeed yspeed 0]
   }
 
+spawnHomingBullet : Model -> Float -> Model
+spawnHomingBullet model speed =
+  {model| bullets = List.append model.bullets [homingBulletUpdate model 
+                                                                  model.x
+                                                                  (model.y-(model.height/2) - 10)
+                                                                  speed
+                                                                  0]}
+
 --BULLET UPDATES
 
 sineBulletUpdate : Float -> Float -> Float -> Float -> Float -> Float -> BUpdater
@@ -42,10 +50,22 @@ straightBulletUpdate x y speed delta =
     in BUpdater (newX, newY) (straightBulletUpdate newX newY speed)
 
 angleBulletUpdate : Float -> Float -> Float -> Float -> Float -> BUpdater
-angleBulletUpdate  x y xspeed yspeed delta =
+angleBulletUpdate x y xspeed yspeed delta =
   let newY = y + ((yspeed * delta) / 60 )
       newX = x + ((xspeed * delta) / 60 )
   in BUpdater (newX, newY) (angleBulletUpdate newX newY xspeed yspeed)
+
+homingBulletUpdate : Model -> Float -> Float -> Float -> Float -> BUpdater
+homingBulletUpdate model x y speed delta =
+  let (targetX, targetY) = (getClosestEnemy model x y (stillEnemyUpdate x -200 2 2 0)) in
+  let yDist = (y - targetY)
+      xDist = (x - targetX)
+      realDist = sqrt(xDist^2 + yDist^2)
+      newX = x + xDist / realDist * speed * delta /60
+      newY = y + yDist / realDist * speed * delta /60
+
+  in BUpdater (newX, newY) (homingBulletUpdate model newX newY speed)
+
 
 --ENEMY UPDATES
 stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
@@ -114,6 +134,29 @@ enemyIsAlive model updater =
               False 
               model.bullets))
 
+getDistance : Float -> Float -> Float -> Float -> Float
+getDistance x1 y1 x2 y2 =
+  sqrt((y2-y1)^2 + (x2-x1)^2)
+
+getClosestEnemy : Model -> Float -> Float -> EnemyUpdater ->  (Float, Float)
+getClosestEnemy model x y defaultEnemy =
+  let enemy = (List.foldr
+                (\enemy acc-> 
+                  case enemy of 
+                    EnemyUpdater (ex, ey, _, _) _ -> 
+                      case acc of 
+                        EnemyUpdater (accx, accy, _, _) _ -> 
+                          if (getDistance ex ey x y)  < (getDistance model.x model.y accx accy) then
+                            enemy
+                          else
+                            acc)
+                          defaultEnemy
+                          model.enemies) in
+  case enemy of 
+    EnemyUpdater (x, y, _, _) _ ->
+      (x, y)
+
+
 updateControls : Model -> ButtonState -> Model
 updateControls model keyCode =
   case keyCode of
@@ -125,7 +168,7 @@ updateControls model keyCode =
     UpRight -> {model| y = model.y - model.vel, x = model.x + model.vel, key = keyCode}
     DownLeft -> {model| y = model.y + model.vel, x = model.x - model.vel, key = keyCode}
     DownRight -> {model| y = model.y + model.vel, x = model.x + model.vel, key = keyCode}
-    Shoot -> (spawnTripleBullet (updateControls model model.key) 5 -20)
+    Shoot -> (spawnHomingBullet (updateControls model model.key) -20)
     _ -> {model | key = keyCode}
 
 updateBullet : Float -> BUpdater -> BUpdater
