@@ -17,6 +17,15 @@ spawnSineBullet model speed =
                                                                 speed 
                                                                 0]}
 
+spawnTripleBullet : Model -> Float -> Float -> Model
+spawnTripleBullet model xspeed yspeed =
+  {model| bullets = List.append 
+                    model.bullets
+                    [straightBulletUpdate model.x (model.y-(model.height/2)) yspeed 0
+                    ,angleBulletUpdate model.x (model.y-(model.height/2)) xspeed yspeed 0
+                    ,angleBulletUpdate model.x (model.y-(model.height/2)) -xspeed yspeed 0]
+  }
+
 --BULLET UPDATES
 
 sineBulletUpdate : Float -> Float -> Float -> Float -> Float -> Float -> BUpdater
@@ -31,6 +40,12 @@ straightBulletUpdate x y speed delta =
     let newY = y + ((speed * delta) / 60 )
         newX = x
     in BUpdater (newX, newY) (straightBulletUpdate newX newY speed)
+
+angleBulletUpdate : Float -> Float -> Float -> Float -> Float -> BUpdater
+angleBulletUpdate  x y xspeed yspeed delta =
+  let newY = y + ((yspeed * delta) / 60 )
+      newX = x + ((xspeed * delta) / 60 )
+  in BUpdater (newX, newY) (angleBulletUpdate newX newY xspeed yspeed)
 
 --ENEMY UPDATES
 stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
@@ -110,7 +125,7 @@ updateControls model keyCode =
     UpRight -> {model| y = model.y - model.vel, x = model.x + model.vel, key = keyCode}
     DownLeft -> {model| y = model.y + model.vel, x = model.x - model.vel, key = keyCode}
     DownRight -> {model| y = model.y + model.vel, x = model.x + model.vel, key = keyCode}
-    Shoot -> (spawnSineBullet (updateControls model model.key) -20)
+    Shoot -> (spawnTripleBullet (updateControls model model.key) 5 -20)
     _ -> {model | key = keyCode}
 
 updateBullet : Float -> BUpdater -> BUpdater
