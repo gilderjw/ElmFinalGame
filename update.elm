@@ -58,7 +58,7 @@ angleBulletUpdate x y xspeed yspeed delta =
 
 homingBulletUpdate : Float -> Float -> Float -> Model -> Float -> BUpdater
 homingBulletUpdate x y speed model delta =
-  let (targetX, targetY) = (getClosestEnemy model x y (stillEnemyUpdate x -200 2 2 0)) in
+  let (targetX, targetY) = (getClosestEnemy model x y (stillEnemyUpdate x -200 2 2 model 0)) in
   let yDist = (y - targetY)
       xDist = (x - targetX)
       realDist = sqrt(xDist^2 + yDist^2)
@@ -69,8 +69,8 @@ homingBulletUpdate x y speed model delta =
 
 
 --ENEMY UPDATES
-stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
-stillEnemyUpdate x y width height delta =
+stillEnemyUpdate : Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
+stillEnemyUpdate x y width height model delta =
   EnemyUpdater (x-1, y, width, height) (stillEnemyUpdate (x-1) y width height)
 
 --CLEANUP STUFF
@@ -184,10 +184,10 @@ updateBullet model delta updater =
     BUpdater _ func -> func delta
     HUpdater _ func -> func model delta
 
-updateEnemy : Float -> EnemyUpdater -> EnemyUpdater
-updateEnemy delta updater =
+updateEnemy : Model -> Float -> EnemyUpdater -> EnemyUpdater
+updateEnemy model delta updater =
   case updater of
-    EnemyUpdater _ func -> func delta
+    EnemyUpdater _ func -> func model delta
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -197,7 +197,7 @@ update msg model =
           case model.lastTime of
             Just oldTime -> 
               let newBullets = List.map ((updateBullet model) (newTime - oldTime)) model.bullets 
-                  newEnemies = List.map (updateEnemy (newTime - oldTime)) model.enemies
+                  newEnemies = List.map (updateEnemy model (newTime - oldTime)) model.enemies
               in
               (dealWithPlayerCollision {model | lastTime=Just newTime
                       , bullets=List.filter bulletIsOnScreen newBullets

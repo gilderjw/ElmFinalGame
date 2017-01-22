@@ -16,4 +16,4 @@ type BUpdater = BUpdater (Float, Float) (Float -> BUpdater) |
                 HUpdater (Float, Float) (Model -> Float -> BUpdater)
 
 -- the floats go : x, y, width, height
-type EnemyUpdater = EnemyUpdater (Float, Float, Float, Float) (Float -> EnemyUpdater)
+type EnemyUpdater = EnemyUpdater (Float, Float, Float, Float) (Model -> Float -> EnemyUpdater)

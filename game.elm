@@ -89,5 +89,13 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[stillEnemyUpdate 300 40 40 40 0]
+    enemies=[stillEnemyUpdate 300 40 40 40 {x=30,
+                                            y=440, 
+                                            key=None, 
+                                            vel=5, 
+                                            bullets=[],
+                                            width=50,
+                                            height=50,
+                                            lastTime=Nothing,
+                                            enemies=[]} 0]
     }, Cmd.none)
