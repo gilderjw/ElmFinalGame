@@ -1,35 +1,30 @@
 module Update exposing (..)
 
 import Types exposing (..)
---import Time exposing (..)
+
+--BULLET SPAWN
 
 spawnStraightBullet : Model -> Float -> Model
 spawnStraightBullet model speed =
   {model| bullets = List.append model.bullets [straightBulletUpdate model.x (model.y-(model.height/2)) speed 0]}
 
-updateBullet : Float -> BUpdater -> BUpdater
-updateBullet delta updater =
-  case updater of
-    BUpdater _ func -> func delta
+spawnSineBullet : Model -> Float -> Model
+spawnSineBullet model speed = 
+  {model| bullets = List.append model.bullets [sineBulletUpdate model.x 
+                                                                (model.y-(model.height/2)) 
+                                                                model.x 
+                                                                (model.y-(model.height/2)) 
+                                                                speed 
+                                                                0]}
 
-updateEnemy : Float -> EnemyUpdater -> EnemyUpdater
-updateEnemy delta updater =
-  case updater of
-    EnemyUpdater _ func -> func delta
+--BULLET UPDATES
 
-updateControls : Model -> ButtonState -> Model
-updateControls model keyCode =
-  case keyCode of
-    Right -> {model| x = model.x + model.vel, key = keyCode}
-    Left -> {model| x = model.x - model.vel, key = keyCode}
-    Up -> {model| y = model.y - model.vel, key = keyCode}
-    Down -> {model| y = model.y + model.vel, key = keyCode}
-    UpLeft -> {model| y = model.y - model.vel, x = model.x - model.vel, key = keyCode}
-    UpRight -> {model| y = model.y - model.vel, x = model.x + model.vel, key = keyCode}
-    DownLeft -> {model| y = model.y + model.vel, x = model.x - model.vel, key = keyCode}
-    DownRight -> {model| y = model.y + model.vel, x = model.x + model.vel, key = keyCode}
-    Shoot -> (spawnStraightBullet (updateControls model model.key) -20)
-    _ -> {model | key = keyCode}
+sineBulletUpdate : Float -> Float -> Float -> Float -> Float -> Float -> BUpdater
+sineBulletUpdate x y initialX initialY speed delta =
+    let newY = y + (delta/60 * speed)
+        deltaY = newY - initialY
+        newX = initialX + 15*sin (deltaY/20)
+    in BUpdater (newX, newY) (sineBulletUpdate newX newY initialX initialY speed)
 
 straightBulletUpdate : Float -> Float -> Float -> Float -> BUpdater
 straightBulletUpdate x y speed delta =
@@ -37,16 +32,20 @@ straightBulletUpdate x y speed delta =
         newX = x
     in BUpdater (newX, newY) (straightBulletUpdate newX newY speed)
 
+--ENEMY UPDATES
 stillEnemyUpdate : Float -> Float -> Float -> Float -> Float -> EnemyUpdater
 stillEnemyUpdate x y width height delta =
   EnemyUpdater (x, y, width, height) (stillEnemyUpdate x y width height)
 
+--CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool
 bulletIsOnScreen updater =
   case updater of 
     BUpdater (x, y) _ ->
       x <= 500 && x >= 0 && y <= 500 && y >= 0
 
+
+--HIT DETECTION
 hit : Float -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> Bool
 hit x1 y1 width1 height1 x2 y2 width2 height2 =
   (abs (x1 - x2)) < (width1/2 + width2/2) &&
@@ -90,8 +89,6 @@ dealWithPlayerCollision model =
   else
     model
 
-
-
 enemyIsAlive : Model -> EnemyUpdater ->  Bool
 enemyIsAlive model updater =
   case updater of 
@@ -101,6 +98,30 @@ enemyIsAlive model updater =
               (\bullet acc -> (acc || (isEnemyHitByBullet updater bullet))) 
               False 
               model.bullets))
+
+updateControls : Model -> ButtonState -> Model
+updateControls model keyCode =
+  case keyCode of
+    Right -> {model| x = model.x + model.vel, key = keyCode}
+    Left -> {model| x = model.x - model.vel, key = keyCode}
+    Up -> {model| y = model.y - model.vel, key = keyCode}
+    Down -> {model| y = model.y + model.vel, key = keyCode}
+    UpLeft -> {model| y = model.y - model.vel, x = model.x - model.vel, key = keyCode}
+    UpRight -> {model| y = model.y - model.vel, x = model.x + model.vel, key = keyCode}
+    DownLeft -> {model| y = model.y + model.vel, x = model.x - model.vel, key = keyCode}
+    DownRight -> {model| y = model.y + model.vel, x = model.x + model.vel, key = keyCode}
+    Shoot -> (spawnSineBullet (updateControls model model.key) -20)
+    _ -> {model | key = keyCode}
+
+updateBullet : Float -> BUpdater -> BUpdater
+updateBullet delta updater =
+  case updater of
+    BUpdater _ func -> func delta
+
+updateEnemy : Float -> EnemyUpdater -> EnemyUpdater
+updateEnemy delta updater =
+  case updater of
+    EnemyUpdater _ func -> func delta
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
