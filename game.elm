@@ -89,6 +89,7 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
+    motiondots=[(10,20), (50, 200), (250, 8), (480, 120)],
     enemies=[shootingEnemyUpdate 
                 200
                 20
@@ -105,5 +106,6 @@ init =
                  width=50,
                  height=50,
                  lastTime=Nothing,
+                 motiondots=[],
                  enemies=[]} 0]
     }, Cmd.none)

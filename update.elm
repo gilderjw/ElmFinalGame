@@ -169,7 +169,7 @@ dealWithPlayerCollision model =
                         (isPlayerHitByBullet model bullet))
         False
         model.bullets)) then 
-    {model|x = 9999999} -- nice and elegent solution for killing a player
+    {model|x = 9999999, enemies = [], bullets = []} -- nice and elegent solution for killing a player
   else
     model
 
@@ -220,6 +220,12 @@ updateControls model keyCode =
     Shoot -> (spawnHomingBullet (updateControls model model.key) -20)
     _ -> {model | key = keyCode}
 
+updateDots : List((Float, Float)) -> Float -> List((Float, Float))
+updateDots dots delta =
+  List.map (\dot -> 
+                    let (x, y) = dot
+                    in (x, (toFloat ((round (y - delta*30)) % 500)))) dots
+
 updateBullet : Model -> Float -> BUpdater -> BUpdater
 updateBullet model delta updater =
   case updater of
@@ -250,6 +256,7 @@ update msg model =
               let newBullets = List.map ((updateBullet model) (newTime - oldTime)) model.bullets 
                   newEnemies = List.map (updateEnemy model (newTime - oldTime)) model.enemies
               in (dealWithPlayerCollision {model | lastTime=Just newTime
+                        , motiondots=(updateDots model.motiondots (newTime - oldTime))
                         , bullets=List.filter bulletIsOnScreen newBullets
                         , enemies= List.filter (enemyIsAlive model) newEnemies}, Cmd.none)
             Nothing -> ({model | lastTime = Just newTime}, Cmd.none)

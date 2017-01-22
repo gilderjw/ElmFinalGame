@@ -4,7 +4,7 @@ import Time exposing (..)
 type alias Model = 
   {x : Float, y : Float, key : ButtonState, vel : Float
   , bullets : List(BUpdater), lastTime : Maybe Time
-  , width : Float, height : Float, enemies : List(EnemyUpdater)}
+  , width : Float, height : Float, enemies : List(EnemyUpdater), motiondots : List((Float, Float))}
 
 type Msg
   = Key ButtonState | Tick Time | Tock Time

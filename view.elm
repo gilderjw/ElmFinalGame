@@ -21,9 +21,15 @@ enemyToImage updater =
            , height (toString height1)
            , fill "#ffff00"] []
 
+motiondotToImage: (Float, Float) -> Svg Msg
+motiondotToImage (xp, yp) = 
+  rect [x (toString xp), y (toString yp), width "5", height "10", fill "#CCCCCC"] []
+
 view : Model -> Html Msg
 view model = 
    svg [ viewBox "0 0 500 500", width "500px" ]
+      (List.append
+        (List.map motiondotToImage model.motiondots)
        (List.append 
          (List.append
            (List.map bulletToImage model.bullets)
@@ -34,4 +40,4 @@ view model =
                   height (toString model.height), 
                   fill "#0B79CE" ] []
          ]
-       )
+       ))
