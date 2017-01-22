@@ -5,7 +5,7 @@ import Types exposing (..)
 
 spawnStraightBullet : Model -> Float -> Model
 spawnStraightBullet model speed =
-  {model| bullets = List.append model.bullets [straightBulletUpdate model.x model.y speed 0]}
+  {model| bullets = List.append model.bullets [straightBulletUpdate model.x (model.y-(model.height/2)) speed 0]}
 
 updateBullet : Float -> BUpdater -> BUpdater
 updateBullet delta updater =
@@ -66,13 +66,26 @@ isPlayerHitByEnemy model enemy =
     EnemyUpdater (x, y, width, height) _ ->
       (hit x y width height model.x model.y model.width model.height)
 
+isPlayerHitByBullet : Model -> BUpdater -> Bool
+isPlayerHitByBullet model bullet = 
+  case bullet of
+    BUpdater (x, y) _ -> 
+      (hit x y 5 5 model.x model.y model.width model.height)
+
+
 dealWithPlayerCollision : Model -> Model
 dealWithPlayerCollision model =
-  if (List.foldr 
+  if ((List.foldr --Checking enemy collision
         (\enemy acc -> acc || 
                       (isPlayerHitByEnemy model enemy)) 
         False 
-        model.enemies) then
+        model.enemies) || 
+      --Check for bullet collision
+       (List.foldr 
+        (\bullet acc -> acc || 
+                        (isPlayerHitByBullet model bullet))
+        False
+        model.bullets)) then 
     {model|x = 9999999} -- nice and elegent solution for killing a player
   else
     model
