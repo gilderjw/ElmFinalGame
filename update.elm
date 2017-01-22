@@ -71,7 +71,15 @@ homingBulletUpdate x y speed model delta =
 --ENEMY UPDATES
 stillEnemyUpdate : Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
 stillEnemyUpdate x y width height model delta =
-  EnemyUpdater (x-1, y, width, height) (stillEnemyUpdate (x-1) y width height)
+  EnemyUpdater (x, y, width, height) (stillEnemyUpdate x y width height)
+
+
+fallingEnemyUpdate : Float -> Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
+fallingEnemyUpdate x y width height speed model delta =
+    let newY = y + ((speed * delta) / 60 )
+        newX = x
+    in EnemyUpdater (newX, newY, width, height) (fallingEnemyUpdate newX newY width height speed)
+
 
 --CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool

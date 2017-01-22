@@ -89,7 +89,7 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[stillEnemyUpdate 300 40 40 40 {x=30,
+    enemies=[fallingEnemyUpdate 30 40 40 40 10 {x=30,
                                             y=440, 
                                             key=None, 
                                             vel=5, 
