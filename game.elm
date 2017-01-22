@@ -81,7 +81,7 @@ main =
 
 init : (Model, Cmd Msg)
 init =
-  ({x=30,
+  ({x=200,
     y=440, 
     key=None, 
     vel=5, 
@@ -89,7 +89,7 @@ init =
     width=50,
     height=50,
     lastTime=Nothing,
-    enemies=[fallingEnemyUpdate 30 40 40 40 10 {x=30,
+    enemies=[sineEnemyUpdate 200 0 200 0 40 40 10 {x=30,
                                             y=440, 
                                             key=None, 
                                             vel=5, 

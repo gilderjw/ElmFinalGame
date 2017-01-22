@@ -80,6 +80,12 @@ fallingEnemyUpdate x y width height speed model delta =
         newX = x
     in EnemyUpdater (newX, newY, width, height) (fallingEnemyUpdate newX newY width height speed)
 
+sineEnemyUpdate : Float -> Float -> Float -> Float -> Float -> Float -> Float -> Model -> Float -> EnemyUpdater
+sineEnemyUpdate x y initialX initialY width height speed model delta =
+  let newY = y + (delta/60 * speed)
+      deltaY = newY - initialY
+      newX = initialX + 80*sin (deltaY/20)
+  in EnemyUpdater (newX, newY, width, height) (sineEnemyUpdate newX newY initialX initialY width height speed)
 
 --CLEANUP STUFF
 bulletIsOnScreen : BUpdater -> Bool
